@@ -5,6 +5,7 @@ import java.util.*;
 public class mergeSortProg {
 	
 	public static void mergeSort(int[] arr, int left, int right) {
+        // left != right , it will cause outOfBound
         if (left < right) {
             int mid = left + (right - left) / 2;
             mergeSort(arr, left, mid);
