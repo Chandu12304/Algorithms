@@ -1,64 +1,53 @@
-package daaManual;
+class AWQ {
+    static int NO_OF_CHARS = 256;  // Number of possible ASCII characters
 
-import java.util.*;
+    // Utility function to get the maximum of two numbers
+    static int max(int a, int b) {
+        return (a > b) ? a : b;
+    }
 
-public class HorspoolAlgo {
+    // Function to fill the bad character heuristic array for the pattern
+    static void badCharHeuristic(char[] str, int size, int badchar[]) {
+        // Initialize all occurrences as -1
+        for (int i = 0; i < NO_OF_CHARS; i++)
+            badchar[i] = -1;
 
-    // Function to perform Horspool's search algorithm
-    public int horspool(String haystack, String needle) {
-        int n = haystack.length(); // Length of the haystack (text)
-        int m = needle.length();   // Length of the needle (pattern)
+        // Fill the actual value of the last occurrence of a character in the pattern
+        for (int i = 0; i < size; i++)
+            badchar[(int) str[i]] = i;
+    }
 
-        // Edge case: if needle is empty, return 0
-        if (m == 0) return 0;
-        // If needle is longer than haystack, return -1 (no match possible)
-        if (m > n) return -1;
+    // Function to search for pattern occurrences in the text using the Boyer-Moore algorithm
+    static void search(char txt[], char pat[]) {
+        int m = pat.length;  // Length of the pattern
+        int n = txt.length;  // Length of the text
+        int badchar[] = new int[NO_OF_CHARS];  // Array to store bad character heuristic values
 
-        // Create a bad character shift table for the needle
-        Map<Character, Integer> shiftTable = new HashMap<>();
-        
-        // Populate the shift table: the last character gets the default shift, others get specific values
-        for (int i = 0; i < m - 1; i++) {
-            shiftTable.put(needle.charAt(i), m - 1 - i);
-        }
+        // Preprocess the pattern to fill the bad character heuristic array
+        badCharHeuristic(pat, m, badchar);
 
-        // Default shift for characters not in the needle
-        int defaultShift = m;
+        int s = 0;  // Initialize the shift of the pattern with respect to text
+        while (s <= (n - m)) {  // Loop to slide the pattern over the text
+            int j = m - 1;  // Start matching from the end of the pattern
 
-        int i = 0; // Start from the beginning of haystack
-        while (i <= n - m) {
-            int j = m - 1; // Compare from the last character of the needle
-
-            // Compare needle with the substring of haystack
-            while (j >= 0 && needle.charAt(j) == haystack.charAt(i + j)) {
+            // Move j to the left while characters in pattern and text are matching
+            while (j >= 0 && pat[j] == txt[s + j])
                 j--;
+
+            // If the pattern is found
+            if (j < 0) {
+                System.out.println("Pattern occurs at shift = " + s);
+                return;  // Exit the function after finding the first occurrence
+            } else {
+                // Shift the pattern based on the bad character rule
+                s += j - badchar[txt[s + j]];
             }
-
-            // If all characters matched, return the start index
-            if (j < 0) return i;
-
-            // Move the pointer based on the bad character shift table or default shift
-            char badChar = haystack.charAt(i + m - 1);
-            i += shiftTable.getOrDefault(badChar, defaultShift);
         }
-
-        // No match found
-        return -1;
     }
 
     public static void main(String[] args) {
-    	HorspoolAlgo hs = new HorspoolAlgo();
-        
-        String haystack = "abracadabra";
-        String needle = "cad";
-
-        int index = hs.horspool(haystack, needle);
-
-        if (index != -1) {
-            System.out.println("Needle found at index: " + index);
-        } else {
-            System.out.println("Needle not found.");
-        }
+        char txt[] = "ABAAABCD".toCharArray();  // Text to search within
+        char pat[] = "BCD".toCharArray();       // Pattern to search for
+        search(txt, pat);  // Call the search function
     }
 }
-
