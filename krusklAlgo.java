@@ -92,13 +92,9 @@ class Main {
         adj[4].add(new int[]{3, 1});
         adj[4].add(new int[]{2, 2});
 
-        // Display the adjacency list
-        for (int i = 0; i < V; i++) {
-            System.out.print("Node " + i + ": ");
-            for (int[] edge : adj[i]) {
-                System.out.print("-> (" + edge[0] + ", " + edge[1] + ") ");
-            }
-            System.out.println();
-        }
+        Solution obj = new Solution();
+        int mstWt = obj.spanningTree(V, adj);
+        System.out.println("The sum of all the edge weights: " + mstWt);
+
     }
 }
