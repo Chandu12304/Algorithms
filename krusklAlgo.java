@@ -1,13 +1,10 @@
-import java.io.*;
 import java.util.*;
-
-
-// User function Template for Java
 
 class DisjointSet {
     List<Integer> rank = new ArrayList<>();
     List<Integer> parent = new ArrayList<>();
     List<Integer> size = new ArrayList<>();
+
     public DisjointSet(int n) {
         for (int i = 0; i <= n; i++) {
             rank.add(0);
@@ -38,45 +35,28 @@ class DisjointSet {
         }
     }
 }
-class Edge implements Comparable<Edge> {
-    int src, dest, weight;
-    Edge(int _src, int _dest, int _wt) {
-        this.src = _src; this.dest = _dest; this.weight = _wt;
-    }
-    // Comparator function used for
-    // sorting edgesbased on their weight
-    public int compareTo(Edge compareEdge) {
-        return this.weight - compareEdge.weight;
-    }
-};
-class Solution {
-    //Function to find sum of weights of edges of the Minimum Spanning Tree.
-    static int spanningTree(int V,
-                            ArrayList<ArrayList<ArrayList<Integer>>> adj) {
-        List<Edge> edges = new ArrayList<Edge>();
-        // O(N + E)
-        for (int i = 0; i < V; i++) {
-            for (int j = 0; j < adj.get(i).size(); j++) {
-                int adjNode = adj.get(i).get(j).get(0);
-                int wt = adj.get(i).get(j).get(1);
-                int node = i;
-                Edge temp = new Edge(i, adjNode, wt);
-                edges.add(temp);
-            }
-        }
-        DisjointSet ds = new DisjointSet(V);
-        // M log M
-        Collections.sort(edges);
-        int mstWt = 0;
-        // M x 4 x alpha x 2
-        for (int i = 0; i < edges.size(); i++) {
-            int wt = edges.get(i).weight;
-            int u = edges.get(i).src;
-            int v = edges.get(i).dest;
 
-            if (ds.findUPar(u) != ds.findUPar(v)) {
-                mstWt += wt;
-                ds.unionBySize(u, v);
+class Solution {
+    static int spanningTree(int V, ArrayList<int[]> adj[]) {
+        // Sort each adjacency list by weight (adjacentNode[1])
+        for (int i = 0; i < V; i++) {
+            adj[i].sort((a, b) -> Integer.compare(a[1], b[1]));
+        }
+
+        DisjointSet ds = new DisjointSet(V);
+        int mstWt = 0;
+
+        // Loop through each node and add edges in sorted order
+        for (int i = 0; i < V; i++) {
+            for (int[] neighbor : adj[i]) {
+                int u = i;
+                int v = neighbor[0];
+                int wt = neighbor[1];
+
+                if (ds.findUPar(u) != ds.findUPar(v)) {
+                    mstWt += wt;
+                    ds.unionBySize(u, v);
+                }
             }
         }
 
@@ -84,36 +64,41 @@ class Solution {
     }
 }
 
+
 class Main {
-    public static void main (String[] args) {
+    public static void main(String[] args) {
         int V = 5;
-        ArrayList<ArrayList<ArrayList<Integer>>> adj = new ArrayList<ArrayList<ArrayList<Integer>>>();
-        int[][] edges =  {{0, 1, 2}, {0, 2, 1}, {1, 2, 1}, {2, 3, 2}, {3, 4, 1}, {4, 2, 2}};
+        ArrayList<int[]> adj[] = new ArrayList[V];
 
         for (int i = 0; i < V; i++) {
-            adj.add(new ArrayList<ArrayList<Integer>>());
+            adj[i] = new ArrayList<>();
         }
 
-        for (int i = 0; i < 6; i++) {
-            int u = edges[i][0];
-            int v = edges[i][1];
-            int w = edges[i][2];
+        // Directly adding edges to the adjacency list
+        adj[0].add(new int[]{1, 2});
+        adj[0].add(new int[]{2, 1});
+        
+        adj[1].add(new int[]{0, 2});
+        adj[1].add(new int[]{2, 1});
 
-            ArrayList<Integer> tmp1 = new ArrayList<Integer>();
-            ArrayList<Integer> tmp2 = new ArrayList<Integer>();
-            tmp1.add(v);
-            tmp1.add(w);
+        adj[2].add(new int[]{0, 1});
+        adj[2].add(new int[]{1, 1});
+        adj[2].add(new int[]{3, 2});
+        adj[2].add(new int[]{4, 2});
 
-            tmp2.add(u);
-            tmp2.add(w);
+        adj[3].add(new int[]{2, 2});
+        adj[3].add(new int[]{4, 1});
 
-            adj.get(u).add(tmp1);
-            adj.get(v).add(tmp2);
+        adj[4].add(new int[]{3, 1});
+        adj[4].add(new int[]{2, 2});
+
+        // Display the adjacency list
+        for (int i = 0; i < V; i++) {
+            System.out.print("Node " + i + ": ");
+            for (int[] edge : adj[i]) {
+                System.out.print("-> (" + edge[0] + ", " + edge[1] + ") ");
+            }
+            System.out.println();
         }
-
-        Solution obj = new Solution();
-        int mstWt = obj.spanningTree(V, adj);
-        System.out.println("The sum of all the edge weights: " + mstWt);
-
     }
 }
