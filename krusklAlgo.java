@@ -38,11 +38,11 @@ public class MST {
         }
     }
 
-    // Function to find sum of weights of edges of the Minimum Spanning Tree.
+    // Function to find the sum of weights of edges of the Minimum Spanning Tree.
     public static int spanningTree(int V, ArrayList<ArrayList<ArrayList<Integer>>> adj) {
         List<int[]> edges = new ArrayList<>();
-
-        // Collect edges directly as [weight, src, dest] for sorting
+        
+        // Convert adjacency list to edge list
         for (int i = 0; i < V; i++) {
             for (ArrayList<Integer> neighbor : adj.get(i)) {
                 int adjNode = neighbor.get(0);
@@ -52,11 +52,12 @@ public class MST {
         }
 
         // Sort edges based on weights
-        edges.sort(Comparator.comparingInt(a -> a[0]));
+        edges.sort((a, b) -> a[0] - b[0]);
 
         DisjointSet ds = new DisjointSet(V);
         int mstWt = 0;
 
+        // Kruskal's algorithm to construct MST
         for (int[] edge : edges) {
             int wt = edge[0];
             int u = edge[1];
